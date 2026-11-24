@@ -20,10 +20,28 @@ specific build, set `VICTORY_EXE` to its Linux path. By default the launcher
 looks beside itself for `victory.exe`, then under `${CARGO_TARGET_DIR:-target}`
 for the gnullvm and MSVC release builds, in that order.
 
-On first launch UMU fetches Proton and the Steam Linux Runtime. The default
-prefix is `${XDG_DATA_HOME:-$HOME/.local/share}/victory/proton`, and the
-default `GAMEID` is `umu-victory`. Set `WINEPREFIX`, `GAMEID` or `PROTONPATH`
-to override them. Use Windows paths in `victory.toml`.
+The launcher prefers an installed GE-Proton when `PROTONPATH` is unset;
+otherwise UMU fetches its default Proton and the Steam Linux Runtime. The
+default prefix is `${XDG_DATA_HOME:-$HOME/.local/share}/victory/proton`, and
+the default `GAMEID` is `umu-victory`. Set `WINEPREFIX`, `GAMEID` or
+`PROTONPATH` to override them. Use Windows paths in `victory.toml`.
+
+With Nix and `<nixpkgs>` available, `nix-shell` provides Rustup,
+`cargo-xwin`, UMU, and the LLVM tools for the MSVC cross-build:
+
+```sh
+nix-shell
+cargo xwin build --release -p victory --target x86_64-pc-windows-msvc
+./scripts/victory-proton.sh "/path/to/game/title.exe" --execute
+```
+
+## Controllers
+
+XInput pads and DualSense/DualSense Edge controllers (USB or Bluetooth) are
+supported. Connect the controller before launching. UMU runs outside Steam, so
+Steam Input remapping is not applied; the supported pads are read directly.
+When no pad is connected, the keyboard mapping in the README acts as a pad
+while the title window has focus.
 
 ## Building with LLVM-MinGW
 

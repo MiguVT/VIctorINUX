@@ -44,10 +44,24 @@ binary=$(realpath -- "$binary")
 title=$(realpath -- "$1")
 shift
 
+# Prefer an installed GE-Proton; UMU-Proton remains the fallback.
+if [[ -z ${PROTONPATH:-} ]]; then
+    for candidate in \
+        "$HOME/.local/share/Steam/compatibilitytools.d/GE-Proton-nix" \
+        "$HOME/.local/share/Steam/compatibilitytools.d"/GE-Proton* \
+        "$HOME/.steam/root/compatibilitytools.d"/GE-Proton*; do
+        if [[ -x $candidate/proton ]]; then
+            export PROTONPATH=$candidate
+            break
+        fi
+    done
+fi
+
 # Hand Proton Windows paths on its standard Z: drive. A Windows executable
 # path also lets UMU-Proton attach this CLI to the calling terminal.
 export GAMEID=${GAMEID:-umu-victory}
 export WINEPREFIX=${WINEPREFIX:-${XDG_DATA_HOME:-$HOME/.local/share}/victory/proton}
+export WINEDLLOVERRIDES="${WINEDLLOVERRIDES:-d3d12=n,b;d3d12core=n,b;dxgi=n,b}"
 windows_title=${title//\//\\}
 windows_binary=${binary//\//\\}
 export STEAM_COMPAT_INSTALL_PATH=${STEAM_COMPAT_INSTALL_PATH:-$(dirname -- "$binary")}
